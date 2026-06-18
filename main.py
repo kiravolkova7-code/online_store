@@ -1,5 +1,25 @@
 from src.classes import *
+from src.reader_json import load_categories_from_json
 
+
+if __name__ == "__main__":
+    json_file_path = 'data/products.json'
+    categories_list = load_categories_from_json(json_file_path)
+
+    print("=== Загруженные данные ===")
+    for cat in categories_list:
+        print(f"\nКатегория: {cat.name}")
+        print(f"Описание: {cat.description}")
+        print(f"Кол-во товаров: {len(cat.products)}")
+        for p in cat.products:
+            print(f" - Товар: {p.name}, Цена: {p.price} руб.")
+
+    print("\n=== Статистика ===")
+    print(f"Всего категорий создано: {Category.category_count}")
+    print(f"Всего товаров создано: {Category.product_count}")
+
+
+'''
 if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
@@ -42,3 +62,4 @@ if __name__ == "__main__":
 
     print(Category.category_count)
     print(Category.product_count)
+'''
