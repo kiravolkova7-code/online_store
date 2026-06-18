@@ -1,7 +1,7 @@
 import pytest
-from src.classes import *
+from src.classes import Product, Category
 
-# --- Фикстуры для данных ---
+
 @pytest.fixture
 def sample_products():
     return [
@@ -26,9 +26,6 @@ def reset_class_counters():
     """
     Автоматически сбрасывает глобальные счетчики класса Category перед каждым тестом.
     """
-    original_category_count = Category.category_count
-    original_product_count = Category.product_count
-
     Category.category_count = 0
     Category.product_count = 0
     yield
