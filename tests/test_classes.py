@@ -20,7 +20,6 @@ def smartphone_category(sample_products):
     )
 
 
-# --- Автоматическая фикстура для сброса глобального состояния ---
 @pytest.fixture(autouse=True)
 def reset_class_counters():
     """
@@ -57,21 +56,24 @@ def test_category_initialization(smartphone_category):
 
 
 def test_multiple_categories_and_products():
-    """Проверяет подсчет при создании нескольких категорий."""
-
-    tv_product = Product("55\" QLED", "4K", 123000.0, 7)
+    """
+    Проверяет подсчет при создании нескольких категорий.
+    """
+    tv_product = Product("55\" QLED", "4K", 123000.0, 7) # 7 штук
 
     category_tv = Category("Телевизоры", "Помощник", [tv_product])
 
-    category_phone = Category("Смартфоны", "Для связи", [
-        Product("A1", "", 1.0, 1),
-        Product("A2", "", 2.0, 2)
-    ])
-
-    # Итого: создано 2 категории и добавлено 1 + 2 = 3 продукта.
+    category_phone = Category(
+        "Смартфоны",
+        "Для связи",
+        [
+            Product("A1", "", 1.0, 1),   # 1 штука
+            Product("A2", "", 2.0, 2)    # 2 штуки
+        ]
+    )
 
     assert Category.category_count == 2
-    assert Category.product_count == 3
+    assert Category.product_count == 10
 
 
 # Новые тесты по домашке 14-2
@@ -134,7 +136,9 @@ def test_category_add_product_success():
     final_count = len(category.products)
 
     assert final_count == initial_count + 1
-    assert product in category.products
+
+    expected_string = f"{product.name}, {product.price:.2f} руб. Остаток: {product.quantity} шт."
+    assert expected_string in category.products
 
 
 def test_category_add_product_wrong_type():
@@ -152,6 +156,7 @@ def test_category_add_product_wrong_type():
 def test_category_products_getter():
     """
     Проверяет, что геттер products возвращает правильный список.
+    Геттер теперь возвращает список СТРОК, поэтому и проверка должна быть соответствующей.
     """
     product = Product("Book", "Fantasy", 500.0, 1)
     category = Category("Books", "Stories", [product])
@@ -160,7 +165,9 @@ def test_category_products_getter():
 
     assert isinstance(retrieved_list, list)
     assert len(retrieved_list) == 1
-    assert retrieved_list[0] is product
+
+    expected_string = f"{product.name}, {product.price:.2f} руб. Остаток: {product.quantity} шт."
+    assert retrieved_list[0] == expected_string
 
 
 def test_category_get_products_formatting():
@@ -174,3 +181,57 @@ def test_category_get_products_formatting():
     expected_string = f"{product.name}, {product.price:.2f} руб. Остаток: {product.quantity} шт."
 
     assert formatted_list[0] == expected_string
+
+# Новые тесты по домашке 15-1
+# Тесты для класса Product
+
+def test_product_str_representation():
+    """Проверяет строковое представление товара (__str__)."""
+    product = Product("Товар А", "Описание", 100.50, 10)
+    expected_output = "Товар А, 100.50 руб. Остаток: 10 шт."
+    assert str(product) == expected_output
+
+
+def test_add_two_products():
+    """Проверяет сложение стоимости двух товаров (__add__)."""
+    a = Product("Товар А", "Описание", 100.50, 10)
+    b = Product("Товар Б", "Описание", 200.75, 5)
+
+    # Ручной расчет: (100.50 * 10) + (200.75 * 5) = 1005.0 + 1003.75 = 2008.75
+    total_cost = a + b
+    assert total_cost == 2008.75
+
+
+def test_add_invalid_type_raises_error():
+    """Проверяет, что при сложении с неподдерживаемым типом вызывается TypeError."""
+    a = Product("Товар А", "Описание", 100, 10)
+
+    with pytest.raises(TypeError) as error_info:
+        result = a + 100  # Сложение с числом
+
+    # Проверяем текст сообщения об ошибке
+    assert "Неподдерживаемый тип" in str(error_info.value)
+
+
+# Тесты для класса Category
+
+@pytest.fixture(autouse=True)
+def reset_category_count():
+    """
+    Фикстура, которая сбрасывает статический счетчик перед каждым тестом.
+    autouse=True означает, что она будет запускаться автоматически без явного указания.
+    """
+    Category.product_count = 0
+
+
+def test_category_str_representation_with_products():
+    """Проверяет строковое представление категории с товарами."""
+    p1 = Product("Телефон", "Хороший", 10000, 2)
+    p2 = Product("Ноутбук", "Отличный", 50000, 1)
+
+    category = Category("Электроника", "Вся электроника тут")
+    category.add_product(p1)
+    category.add_product(p2)
+
+    # Ожидаемое общее количество: 2 (от p1) + 1 (от p2) = 3
+    assert str(category) == "Электроника, количество продуктов: 3 шт."

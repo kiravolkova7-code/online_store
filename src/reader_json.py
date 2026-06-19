@@ -11,30 +11,22 @@ def _read_json_file(file_path: str):
     return data
 
 
-def load_categories_from_json(file_path: str):
-    """
-    Читает данные из JSON-файла и создает список объектов Category с товарами.
-    """
-    raw_data = _read_json_file(file_path)
+def load_categories_from_json(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
     categories = []
+    for cat_data in data:
+        name = cat_data.get('name')
+        description = cat_data.get('description')
+        category = Category(name, description)
 
-    for cat_data in raw_data:
-        product_objects = []
         for prod_data in cat_data.get('products', []):
-            product = Product(
-                name=prod_data['name'],
-                description=prod_data['description'],
-                price=prod_data['price'],
-                quantity=prod_data['quantity']
-            )
-            product_objects.append(product)
+            try:
+                product = Product.new_product(prod_data)
+                category.add_product(product)
+            except Exception as e:
+                print(f"Не удалось создать продукт из данных {prod_data}: {e}")
 
-        category = Category(
-            name=cat_data['name'],
-            description=cat_data['description'],
-            products=product_objects
-        )
         categories.append(category)
-
     return categories

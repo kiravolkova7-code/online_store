@@ -1,3 +1,5 @@
+# tests/test_reader_json.py
+
 import json
 import pytest
 from src.reader_json import load_categories_from_json
@@ -37,14 +39,15 @@ def test_load_categories_from_json_success(tmp_path):
     #   - Проверяем атрибуты объекта Category
     assert category.name == "Смартфоны"
     assert category.description == "Смартфоны, как средство не только коммуникации..."
-    assert len(category.products) == 1
 
-    #   - Проверяем атрибуты вложенного объекта Product
-    product = category.products[0]
-    assert product.name == "Samsung Galaxy S23 Ultra"
-    assert product.price == 180000.0
-    assert product.quantity == 5
+    # --- ИЗМЕНЕНИЕ ---
+    # Получаем список СТРОК вместо объектов Product
+    product_strings = category.products
+    assert len(product_strings) == 1
 
+    # Теперь проверяем, что нужная нам строка находится в этом списке
+    expected_product_str = "Samsung Galaxy S23 Ultra, 180000.00 руб. Остаток: 5 шт."
+    assert expected_product_str in product_strings
 
 def test_load_categories_from_json_file_not_found():
     """
