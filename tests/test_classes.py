@@ -59,7 +59,7 @@ def test_multiple_categories_and_products():
     """
     Проверяет подсчет при создании нескольких категорий.
     """
-    tv_product = Product("55\" QLED", "4K", 123000.0, 7) # 7 штук
+    tv_product = Product("55\" QLED", "4K", 123000.0, 7)
 
     category_tv = Category("Телевизоры", "Помощник", [tv_product])
 
@@ -184,6 +184,7 @@ def test_category_get_products_formatting():
 
 # Новые тесты по домашке 15-1
 # Тесты для класса Product
+
 
 def test_product_str_representation():
     """Проверяет строковое представление товара (__str__)."""
