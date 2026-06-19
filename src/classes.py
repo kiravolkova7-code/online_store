@@ -27,7 +27,6 @@ class Product():
         """Возвращает значение приватного атрибута цены."""
         return self.__price
 
-
     @price.setter
     def price(self, value: float):
         """
@@ -38,6 +37,7 @@ class Product():
             print("Цена не должна быть нулевая или отрицательная")
         else:
             self.__price = value
+
 
 class Category():
     name : str
@@ -71,7 +71,6 @@ class Category():
     def products(self):
         """Геттер для получения списка товаров в категории"""
         return self.__products
-
 
     def get_products(self):
         """
