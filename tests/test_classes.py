@@ -1,5 +1,5 @@
 import pytest
-from src.classes import *
+from src.classes import Product, Smartphone, LawnGrass, Category
 
 
 @pytest.fixture
@@ -105,8 +105,8 @@ def test_product_price_setter_valid_value():
 
     assert product.price == 250.5
 
-# Тесты для класса Category
 
+# Тесты для класса Category
 def test_category_add_product_success():
     """
     Проверяет успешное добавление товара в категорию.
@@ -195,14 +195,11 @@ def test_add_invalid_type_raises_error():
     assert "unsupported operand type(s) for +: 'Product' and 'int'" in str(error_info.value)
 
 
-
 # Тесты для класса Category
-
 @pytest.fixture(autouse=True)
 def reset_category_count():
     """
     Фикстура, которая сбрасывает статический счетчик перед каждым тестом.
-    autouse=True означает, что она будет запускаться автоматически без явного указания.
     """
     Category.product_count = 0
 
@@ -215,9 +212,8 @@ def test_category_str_representation_with_products():
     category = Category("Электроника", "Вся электроника тут")
     category.add_product(p1)
     category.add_product(p2)
-
-    # Ожидаемое общее количество: 2 (от p1) + 1 (от p2) = 3
     assert str(category) == "Электроника, количество продуктов: 3 шт."
+
 
 # Новые тесты по домашке 16-1
 # Тесты для дочернего класса Smartphone
@@ -242,6 +238,7 @@ def test_smartphone_initialization():
     assert phone.model == "X1"
     assert phone.memory == 128
     assert phone.color == "Black"
+
 
 # Тесты для дочернего класса LawnGrass
 def test_lawn_grass_initialization():
@@ -298,12 +295,12 @@ def test_add_different_classes():
 
     assert "unsupported operand type(s) for +: 'Smartphone' and 'LawnGrass'" in str(exc_info.value)
 
+
 # Тесты для класса Category
 def test_add_valid_product():
     """Проверяет добавление валидного продукта в категорию."""
     category = Category("Phones", "Category for phones")
     product = Product("Generic Product", "Desc", 10.0, 5)
-
     category.add_product(product)
 
     # Проверяем, что продукт добавлен в список и счетчик увеличился

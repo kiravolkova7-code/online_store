@@ -53,7 +53,6 @@ class Product():
             return NotImplemented
 
 
-
 class Smartphone(Product):
     """
     Класс для представления смартфонов.
