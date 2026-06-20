@@ -1,8 +1,8 @@
 class Product():
-    name : str
-    description : str
-    __price : float
-    quantity : int
+    name: str
+    description: str
+    __price: float
+    quantity: int
 
     def __init__(self, name, description, price, quantity):
         self.name = name
@@ -38,10 +38,24 @@ class Product():
         else:
             self.__price = value
 
+    def __str__(self):
+        """Строковое представление товара."""
+        return f"{self.name}, {self.price:.2f} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        """
+        Возвращает общую стоимость двух товаров на складе.
+        """
+        if isinstance(other, Product):
+            total_cost = (self.price * self.quantity) + (other.price * other.quantity)
+            return total_cost
+        else:
+            raise TypeError(f"Неподдерживаемый тип для сложения: '{type(other).__name__}'. Ожидается 'Product'.")
+
 
 class Category():
-    name : str
-    description : str
+    name: str
+    description: str
     __products: list
 
     category_count = 0
@@ -59,25 +73,28 @@ class Category():
 
     def add_product(self, product):
         """
-        Добавляет товар в категорию.
+        Добавляет товар в категорию и увеличивает глобальный счетчик товаров.
         """
         if isinstance(product, Product):
             self.__products.append(product)
-            Category.product_count += 1
+            Category.product_count += product.quantity
         else:
             raise ValueError("Можно добавить только объект класса Product")
 
     @property
     def products(self):
-        """Геттер для получения списка товаров в категории"""
-        return self.__products
+        """
+        Теперь этот геттер при вызове автоматически форматирует список товаров.
+        """
+        return self.get_products()
 
     def get_products(self):
         """
         Возвращает список товаров в виде отформатированных строк.
+        Оптимизировано за счет использования __str__ метода Product.
         """
-        formatted_list = []
-        for product in self.__products:
-            line = f"{product.name}, {product.price:.2f} руб. Остаток: {product.quantity} шт."
-            formatted_list.append(line)
-        return formatted_list
+        return [str(product) for product in self.__products]
+
+    def __str__(self):
+        """Строковое представление категории."""
+        return f"{self.name}, количество продуктов: {Category.product_count} шт."
