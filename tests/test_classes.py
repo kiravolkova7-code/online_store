@@ -1,5 +1,5 @@
 import pytest
-from src.classes import Product, Category
+from src.classes import *
 
 
 @pytest.fixture
@@ -105,23 +105,6 @@ def test_product_price_setter_valid_value():
 
     assert product.price == 250.5
 
-
-def test_product_price_setter_invalid_value():
-    """
-    Проверяет, что при попытке установить некорректную цену (<= 0),
-    внутренняя цена НЕ изменяется.
-    """
-    original_price = 300.0
-    product = Product("Name", "Desc", original_price, 1)
-
-    product.price = -50
-    assert product.price == original_price, "Цена не должна была измениться"
-
-    # Повторим проверку для нуля
-    product.price = 0
-    assert product.price == original_price, "Цена не должна была измениться и при установке в ноль"
-
-
 # Тесты для класса Category
 
 def test_category_add_product_success():
@@ -143,14 +126,13 @@ def test_category_add_product_success():
 
 def test_category_add_product_wrong_type():
     """
-    Проверяет, что ValueError возникает при добавлении неверного типа.
+    Проверяет, что при добавлении неверного типа вызывается TypeError.
     """
     category = Category("Books", "Novels and textbooks")
-
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(TypeError) as exc_info:
         category.add_product("Not a product object")
 
-    assert str(exc_info.value) == "Можно добавить только объект класса Product"
+    assert str(exc_info.value) == "Можно добавить только объект класса Product или его наследников"
 
 
 def test_category_products_getter():
@@ -208,10 +190,10 @@ def test_add_invalid_type_raises_error():
     a = Product("Товар А", "Описание", 100, 10)
 
     with pytest.raises(TypeError) as error_info:
-        result = a + 100  # Сложение с числом
+        result = a + 100
 
-    # Проверяем текст сообщения об ошибке
-    assert "Неподдерживаемый тип" in str(error_info.value)
+    assert "unsupported operand type(s) for +: 'Product' and 'int'" in str(error_info.value)
+
 
 
 # Тесты для класса Category
@@ -236,3 +218,106 @@ def test_category_str_representation_with_products():
 
     # Ожидаемое общее количество: 2 (от p1) + 1 (от p2) = 3
     assert str(category) == "Электроника, количество продуктов: 3 шт."
+
+# Новые тесты по домашке 16-1
+# Тесты для дочернего класса Smartphone
+def test_smartphone_initialization():
+    """Проверяет корректную инициализацию объекта Smartphone."""
+    phone = Smartphone(
+        name="TestPhone",
+        description="A test device",
+        price=50000.0,
+        quantity=10,
+        efficiency=92.5,
+        model="X1",
+        memory=128,
+        color="Black"
+    )
+
+    assert phone.name == "TestPhone"
+    assert phone.description == "A test device"
+    assert phone.price == 50000.0
+    assert phone.quantity == 10
+    assert phone.efficiency == 92.5
+    assert phone.model == "X1"
+    assert phone.memory == 128
+    assert phone.color == "Black"
+
+# Тесты для дочернего класса LawnGrass
+def test_lawn_grass_initialization():
+    """Проверяет корректную инициализацию объекта LawnGrass."""
+    grass = LawnGrass(
+        name="TestGrass",
+        description="For testing",
+        price=400.0,
+        quantity=5,
+        country="Testland",
+        germination_period="10 days",
+        color="Green"
+    )
+
+    assert grass.name == "TestGrass"
+    assert grass.description == "For testing"
+    assert grass.price == 400.0
+    assert grass.quantity == 5
+    assert grass.country == "Testland"
+    assert grass.germination_period == "10 days"
+    assert grass.color == "Green"
+
+
+def test_inheritance_validation():
+    """Проверяет, что валидация цены из родительского класса работает в наследниках."""
+    # Проверка для Smartphone
+    with pytest.raises(ValueError):
+        # Если сеттер просто печатает, тест не упадет. Нужно, чтобы он вызывал ValueError.
+        phone = Smartphone("Test", "Desc", -100, 1, 90, "M1", 64, "White")
+
+    # Проверка для LawnGrass
+    with pytest.raises(ValueError):
+        grass = LawnGrass("Test", "Desc", -50, 2, "Land", "5 days", "Green")
+
+
+# Тесты для класса Product
+def test_add_same_class():
+    """Проверяет, что сложение работает для объектов одного класса."""
+    phone1 = Smartphone("P1", "Desc", 10000.0, 2, 95, "M1", 64, "Black")
+    phone2 = Smartphone("P2", "Desc", 20000.0, 3, 98, "M2", 128, "White")
+
+    # Ожидаемый результат: (10000 * 2) + (20000 * 3) = 80000
+    total_cost = phone1 + phone2
+    assert total_cost == 80000.0
+
+
+def test_add_different_classes():
+    """Проверяет, что сложение объектов разных классов вызывает TypeError."""
+    phone = Smartphone("P1", "Desc", 1000.0, 1, 95, "M1", 64, "Black")
+    grass = LawnGrass("G1", "Desc", 500.0, 1, "RU", "7 days", "Green")
+
+    with pytest.raises(TypeError) as exc_info:
+        result = phone + grass
+
+    assert "unsupported operand type(s) for +: 'Smartphone' and 'LawnGrass'" in str(exc_info.value)
+
+# Тесты для класса Category
+def test_add_valid_product():
+    """Проверяет добавление валидного продукта в категорию."""
+    category = Category("Phones", "Category for phones")
+    product = Product("Generic Product", "Desc", 10.0, 5)
+
+    category.add_product(product)
+
+    # Проверяем, что продукт добавлен в список и счетчик увеличился
+    assert len(category.products) == 1
+    assert category.products[0] == str(product)
+    assert Category.product_count == 5
+
+
+def test_add_invalid_object():
+    """Проверяет, что добавление не-объекта вызывает ошибку."""
+    category = Category("Phones", "Category for phones")
+
+    # Ожидание: попытка добавить строку должна вызвать TypeError (согласно вашему исправлению)
+    with pytest.raises(TypeError) as exc_info:
+        category.add_product("Not a product")
+
+    assert str(exc_info.value) == "Можно добавить только объект класса Product или его наследников"
