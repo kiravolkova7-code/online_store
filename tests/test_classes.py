@@ -186,13 +186,14 @@ def test_add_two_products():
 
 
 def test_add_invalid_type_raises_error():
-    """Проверяет, что при сложении с неподдерживаемым типом вызывается TypeError."""
+    """
+    Проверяет, что при сложении с неподдерживаемым типом вызывается TypeError.
+    Теперь тест ожидает НОВОЕ сообщение об ошибке.
+    """
     a = Product("Товар А", "Описание", 100, 10)
-
     with pytest.raises(TypeError) as error_info:
-        result = a + 100
-
-    assert "unsupported operand type(s) for +: 'Product' and 'int'" in str(error_info.value)
+        result = a + 100  # Сложение с числом
+    assert "Нельзя складывать товары разных типов" in str(error_info.value)
 
 
 # Тесты для класса Category
@@ -286,14 +287,16 @@ def test_add_same_class():
 
 
 def test_add_different_classes():
-    """Проверяет, что сложение объектов разных классов вызывает TypeError."""
+    """
+    Проверяет, что сложение объектов разных классов вызывает TypeError.
+    Теперь тест ожидает НОВОЕ сообщение об ошибке.
+    """
     phone = Smartphone("P1", "Desc", 1000.0, 1, 95, "M1", 64, "Black")
     grass = LawnGrass("G1", "Desc", 500.0, 1, "RU", "7 days", "Green")
 
     with pytest.raises(TypeError) as exc_info:
         result = phone + grass
-
-    assert "unsupported operand type(s) for +: 'Smartphone' and 'LawnGrass'" in str(exc_info.value)
+    assert "Нельзя складывать товары разных типов" in str(exc_info.value)
 
 
 # Тесты для класса Category
@@ -303,7 +306,6 @@ def test_add_valid_product():
     product = Product("Generic Product", "Desc", 10.0, 5)
     category.add_product(product)
 
-    # Проверяем, что продукт добавлен в список и счетчик увеличился
     assert len(category.products) == 1
     assert category.products[0] == str(product)
     assert Category.product_count == 5

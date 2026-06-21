@@ -45,12 +45,14 @@ class Product():
     def __add__(self, other):
         """
         Возвращает общую стоимость товаров на складе.
+        Доработано по Заданию 2: складываются только товары одного класса.
+        При попытке сложения объектов разных классов вызывается TypeError.
         """
-        if type(self) is type(other):
-            total_cost = (self.price * self.quantity) + (other.price * other.quantity)
-            return total_cost
-        else:
-            return NotImplemented
+        if isinstance(other, Product):
+            if type(self) is type(other):
+                total_cost = (self.price * self.quantity) + (other.price * other.quantity)
+                return total_cost
+        raise TypeError("Нельзя складывать товары разных типов")
 
 
 class Smartphone(Product):
