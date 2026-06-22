@@ -1,58 +1,124 @@
-class Product():
-    name: str
-    description: str
-    __price: float
-    quantity: int
+from abc import ABC, abstractmethod
+
+class BaseProduct(ABC):
+    """
+    Абстрактный базовый класс для всех продуктов.
+    """
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @name.setter
+    @abstractmethod
+    def name(self, value: str):
+        pass
+
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        pass
+
+    @description.setter
+    @abstractmethod
+    def description(self, value: str):
+        pass
+
+    @property
+    @abstractmethod
+    def price(self) -> float:
+        pass
+
+    @price.setter
+    @abstractmethod
+    def price(self, value: float):
+        pass
+
+    @property
+    @abstractmethod
+    def quantity(self) -> int:
+        pass
+
+    @quantity.setter
+    @abstractmethod
+    def quantity(self, value: int):
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """Должен возвращать строковое представление товара."""
+        pass
+
+
+class CreationLoggerMixin:
+    """
+    Миксин, который логирует создание объекта,
+    выводя имя класса и переданные аргументы.
+    """
+
+    def __init__(self, *args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        print(f"Создан объект класса {self.__class__.__name__} с аргументами: ({signature})")
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self) -> str:
+        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        return f"{self.__class__.__name__}({attrs})"
+
+
+class Product(CreationLoggerMixin, BaseProduct):
+    """
+    Конкретный класс продукта.
+    Наследует логирование от CreationLoggerMixin и обязательный интерфейс от BaseProduct.
+    """
 
     def __init__(self, name, description, price, quantity):
-        self.name = name
-        self.description = description
-        self.price = price  # Используется сеттер для валидации
-        self.quantity = quantity
+        self._name = name
+        self._description = description
+        self.price = price
+        self._quantity = quantity
 
-    @classmethod
-    def new_product(cls, product_data: dict):
-        """
-        Класс-метод для создания объекта Product из словаря.
-        """
-        return cls(
-            name=product_data['name'],
-            description=product_data['description'],
-            price=product_data['price'],
-            quantity=product_data['quantity']
-        )
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._name = value
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @description.setter
+    def description(self, value: str):
+        self._description = value
+
+    _price: float = 0.0
 
     @property
     def price(self) -> float:
-        """Возвращает значение приватного атрибута цены."""
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value: float):
-        """
-        Устанавливает цену товара.
-        Если цена <= 0, выводит предупреждение и не меняет текущую цену.
-        """
         if value <= 0:
-
             raise ValueError("Цена не должна быть нулевая или отрицательная")
-        self.__price = value
+        self._price = value
 
-    def __str__(self):
-        """Строковое представление товара."""
+    @property
+    def quantity(self) -> int:
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, value: int):
+        self._quantity = value
+
+    def __str__(self) -> str:
         return f"{self.name}, {self.price:.2f} руб. Остаток: {self.quantity} шт."
-
-    def __add__(self, other):
-        """
-        Возвращает общую стоимость товаров на складе.
-        Доработано по Заданию 2: складываются только товары одного класса.
-        При попытке сложения объектов разных классов вызывается TypeError.
-        """
-        if isinstance(other, Product):
-            if type(self) is type(other):
-                total_cost = (self.price * self.quantity) + (other.price * other.quantity)
-                return total_cost
-        raise TypeError("Нельзя складывать товары разных типов")
 
 
 class Smartphone(Product):
