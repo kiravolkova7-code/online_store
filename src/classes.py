@@ -7,7 +7,7 @@ class Product():
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.price = price
+        self.price = price  # Используется сеттер для валидации
         self.quantity = quantity
 
     @classmethod
@@ -34,9 +34,9 @@ class Product():
         Если цена <= 0, выводит предупреждение и не меняет текущую цену.
         """
         if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-        else:
-            self.__price = value
+
+            raise ValueError("Цена не должна быть нулевая или отрицательная")
+        self.__price = value
 
     def __str__(self):
         """Строковое представление товара."""
@@ -44,13 +44,40 @@ class Product():
 
     def __add__(self, other):
         """
-        Возвращает общую стоимость двух товаров на складе.
+        Возвращает общую стоимость товаров на складе.
+        Доработано по Заданию 2: складываются только товары одного класса.
+        При попытке сложения объектов разных классов вызывается TypeError.
         """
         if isinstance(other, Product):
-            total_cost = (self.price * self.quantity) + (other.price * other.quantity)
-            return total_cost
-        else:
-            raise TypeError(f"Неподдерживаемый тип для сложения: '{type(other).__name__}'. Ожидается 'Product'.")
+            if type(self) is type(other):
+                total_cost = (self.price * self.quantity) + (other.price * other.quantity)
+                return total_cost
+        raise TypeError("Нельзя складывать товары разных типов")
+
+
+class Smartphone(Product):
+    """
+    Класс для представления смартфонов.
+    """
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        # Вызов конструктора базового класса для инициализации общих атрибутов
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    """
+    Класс для представления газонной травы.
+    """
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        # Вызов конструктора базового класса для инициализации общих атрибутов
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
 
 
 class Category():
@@ -78,13 +105,14 @@ class Category():
         if isinstance(product, Product):
             self.__products.append(product)
             Category.product_count += product.quantity
+            print(f"Добавлен товар: {product.name}")
         else:
-            raise ValueError("Можно добавить только объект класса Product")
+            raise TypeError("Можно добавить только объект класса Product или его наследников")
 
     @property
     def products(self):
         """
-        Теперь этот геттер при вызове автоматически форматирует список товаров.
+        Возвращает список товаров в виде отформатированных строк.
         """
         return self.get_products()
 
