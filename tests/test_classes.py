@@ -1,6 +1,5 @@
 import pytest
-from src.classes import *
-from abc import ABC, abstractmethod
+from src.classes import Product, Category, BaseProduct, CreationLoggerMixin, Smartphone, LawnGrass
 
 
 @pytest.fixture
@@ -348,4 +347,3 @@ def test_creation_logger_with_kwargs():
     log_message = obj.get_creation_log()
     assert "Создан объект класса TestClass" in log_message
     assert "name='Ксения'" in log_message and "age=20" in log_message
-
