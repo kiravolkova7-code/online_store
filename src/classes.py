@@ -53,20 +53,21 @@ class BaseProduct(ABC):
 
 class CreationLoggerMixin:
     """
-    Миксин, который логирует создание объекта,
-    выводя имя класса и переданные аргументы.
+    Миксин, который формирует лог создания объекта,
+    возвращая имя класса и переданные аргументы в виде строки.
     """
 
     def __init__(self, *args, **kwargs):
-        args_repr = [repr(a) for a in args]
-        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
-        signature = ", ".join(args_repr + kwargs_repr)
-        print(f"Создан объект класса {self.__class__.__name__} с аргументами: ({signature})")
-        super().__init__(*args, **kwargs)
+        self._creation_args = args
+        self._creation_kwargs = kwargs
+        super().__init__()
 
-    def __repr__(self) -> str:
-        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({attrs})"
+    def get_creation_log(self) -> str:
+        """Возвращает строку с информацией о создании объекта."""
+        args_repr = [repr(a) for a in self._creation_args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in self._creation_kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        return f"Создан объект класса {self.__class__.__name__} с аргументами: ({signature})"
 
 
 class Product(CreationLoggerMixin, BaseProduct):
@@ -80,6 +81,28 @@ class Product(CreationLoggerMixin, BaseProduct):
         self._description = description
         self.price = price
         self._quantity = quantity
+
+    @classmethod
+    def new_product(cls, product_data: dict):
+        """
+        Класс-метод для создания объекта Product из словаря.
+        """
+        return cls(
+            name=product_data['name'],
+            description=product_data['description'],
+            price=product_data['price'],
+            quantity=product_data['quantity']
+        )
+
+    def __add__(self, other):
+        """
+        Возвращает общую стоимость товаров на складе.
+        """
+        if isinstance(other, Product):
+            if type(self) is type(other):
+                total_cost = (self.price * self.quantity) + (other.price * other.quantity)
+                return total_cost
+        raise TypeError("Нельзя складывать товары разных типов")
 
     @property
     def name(self) -> str:

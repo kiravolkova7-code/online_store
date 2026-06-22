@@ -1,5 +1,6 @@
 import pytest
-from src.classes import Product, Smartphone, LawnGrass, Category
+from src.classes import *
+from abc import ABC, abstractmethod
 
 
 @pytest.fixture
@@ -320,3 +321,31 @@ def test_add_invalid_object():
         category.add_product("Not a product")
 
     assert str(exc_info.value) == "Можно добавить только объект класса Product или его наследников"
+
+
+# Новые тесты по домашке 16-2
+# Тесты для класса BaseProduct
+def test_cannot_create_baseproduct():
+    """
+    Проверка: нельзя создать экземпляр абстрактного класса BaseProduct.
+    """
+    with pytest.raises(TypeError) as error_info:
+        product = BaseProduct()
+    assert "abstract" in str(error_info.value).lower()
+
+
+# Тесты для класса CreationLoggerMixin
+def test_creation_logger_with_kwargs():
+    """
+    Проверка: миксин CreationLoggerMixin правильно запоминает именованные аргументы.
+    """
+    class TestClass(CreationLoggerMixin):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.kwargs = kwargs
+    obj = TestClass(name="Ксения", age=20)
+
+    log_message = obj.get_creation_log()
+    assert "Создан объект класса TestClass" in log_message
+    assert "name='Ксения'" in log_message and "age=20" in log_message
+
