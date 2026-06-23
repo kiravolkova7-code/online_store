@@ -369,12 +369,8 @@ def test_category_middle_price_with_products():
     когда в категории есть товары.
     """
     category = Category("Электроника", "Устройства")
-
-    product1 = Product(name = "Ноутбук",
-                       description = "Мощный ноут", price = 65432.109, quantity = 1)
-    product2 = Product(name = "Мышь",
-                       description = "Беспроводная", price = 1500.75, quantity = 1)
-
+    product1 = Product(name="Ноутбук", description="Мощный ноут", price=65432.109, quantity=1)
+    product2 = Product(name="Мышь", description="Беспроводная", price=1500.75, quantity=1)
     category.add_product(product1)
     category.add_product(product2)
     expected_average = 33466.43
