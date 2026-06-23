@@ -78,9 +78,13 @@ class Product(CreationLoggerMixin, BaseProduct):
     """
 
     def __init__(self, name, description, price, quantity):
+        # Проверка количества перед инициализацией атрибутов
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+
         self._name = name
         self._description = description
-        self.price = price
+        self.price = price  # Используется setter для проверки цены
         self._quantity = quantity
 
     @classmethod
@@ -212,6 +216,17 @@ class Category():
         Оптимизировано за счет использования __str__ метода Product.
         """
         return [str(product) for product in self.__products]
+
+    def middle_price(self):
+        """
+        Подсчитывает средний ценник всех товаров в категории и округляет его до сотых.
+        """
+        try:
+            total_price = sum(product.price for product in self.__products)
+            average_price = total_price / len(self.__products)
+            return round(average_price, 2)
+        except ZeroDivisionError:
+            return 0
 
     def __str__(self):
         """Строковое представление категории."""
