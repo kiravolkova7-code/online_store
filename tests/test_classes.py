@@ -347,3 +347,48 @@ def test_creation_logger_with_kwargs():
     log_message = obj.get_creation_log()
     assert "Создан объект класса TestClass" in log_message
     assert "name='Ксения'" in log_message and "age=20" in log_message
+
+
+# Новые тесты по домашке 17-1
+# Тесты для класса Product
+def test_product_creation_with_zero_quantity():
+    """
+    Проверяет, что при создании товара с quantity <= 0
+    вызывается исключение ValueError с правильным сообщением.
+    """
+    with pytest.raises(ValueError) as exc_info:
+        Product(name="Смартфон", description="Тестовый телефон", price=10000, quantity=0)
+
+    assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
+
+
+# Тесты для класса Category
+def test_category_middle_price_with_products():
+    """
+    Проверяет корректность расчета средней цены,
+    когда в категории есть товары.
+    """
+    category = Category("Электроника", "Устройства")
+
+    product1 = Product(name = "Ноутбук",
+                       description = "Мощный ноут", price = 65432.109, quantity = 1)
+    product2 = Product(name = "Мышь",
+                       description = "Беспроводная", price = 1500.75, quantity = 1)
+
+    category.add_product(product1)
+    category.add_product(product2)
+    expected_average = 33466.43
+    actual_average = category.middle_price()
+    assert actual_average == expected_average
+
+
+def test_category_middle_price_without_products():
+    """
+    Проверяет, что метод middle_price возвращает 0,
+    если в категории нет ни одного товара.
+    """
+    empty_category = Category("Пустая категория", "Здесь ничего нет")
+    # Метод должен вернуть 0 без вызова ошибки ZeroDivisionError
+    average_price = empty_category.middle_price()
+
+    assert average_price == 0
